@@ -1,0 +1,10 @@
+*.py[cod]
+media
+static
+.idea
+cache/*
+logs/*
+*.DS_Store
+._.DS_Store
+**/.DS_Store
+**/._.DS_Store

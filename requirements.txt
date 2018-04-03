@@ -1,0 +1,6 @@
+Django==2.0.2
+Pillow==4.2.1
+psycopg2==2.7.4
+psycopg2-binary==2.7.4
+django-cleanup==2.1.0
+uWSGI==2.0.16
