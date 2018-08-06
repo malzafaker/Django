@@ -1,0 +1,66 @@
+version: '2'  
+services:
+
+  nginx:
+    restart: always
+    image: nginx:latest
+    container_name: nginx_1
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/src
+      - ./config/nginx:/etc/nginx/conf.d
+      - ./src/static:/static
+      - ./src/media:/media/
+    depends_on:
+      - web
+
+  web:
+    restart: always
+    build: .
+    container_name: web_1
+    env_file: .env
+    volumes:
+      - ./src:/src
+      - ./src/static:/static
+      - ./src/media:/media/
+    ports:
+      - "8001:8001"
+    links:
+      - postgresql
+      - rabbit
+      - redis
+    depends_on:
+      - postgresql
+      - rabbit
+      - redis
+
+  redis:
+    restart: always
+    image: redis:latest
+    container_name: redis_1
+    ports:
+     - '6379:6379'
+    depends_on:
+        - rabbit
+
+  rabbit:
+    hostname: rabbit
+    image: rabbitmq:3.6.0
+    container_name: rabbit_1
+    environment:
+      - RABBITMQ_DEFAULT_USER=django
+      - RABBITMQ_DEFAULT_PASS=django
+    ports:
+      - "5672:5672"  # we forward this port because it's useful for debugging
+      - "15672:15672"  # here, we can access rabbitmq management plugin
+
+  postgresql:
+    image: postgres:9.3
+    container_name: postgresql
+    env_file: .env
+#    volumes:
+#      - ./config/pgdata:/var/lib/postgresql/data/pgdata
+    ports:
+      - "5433:5432"
+      - "5050:5050"

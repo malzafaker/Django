@@ -8,3 +8,7 @@ logs/*
 ._.DS_Store
 **/.DS_Store
 **/._.DS_Store
+settings/env/development.py
+celeryev.pid
+celerybeat-schedule
+config/pgdata/*
