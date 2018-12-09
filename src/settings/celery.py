@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
 import os
@@ -11,13 +10,11 @@ from celery.task import periodic_task
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings.base')
 
 
-# app = Celery('wikiworks', broker='amqp://guest@localhost//')
-app = Celery('wikiworks', broker='amqp://django:django@localhost:5672/django_vhost')
+app = Celery('project')
 
 
 app.config_from_object('django.conf:settings', namespace='CELERY')
-from django.conf import settings  # noqa
-app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
+app.autodiscover_tasks()
 
 
 @app.task(bind=True)

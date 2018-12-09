@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*-
 # from captcha.fields import CaptchaField
 
 from django import forms
@@ -53,54 +52,6 @@ class UserCreationForm(forms.ModelForm):
         user.set_password(password)
         user.username = self.cleaned_data["email"]
         user.is_active = True
-        user.save()
-        return user
-
-
-class UserCreationFormAnybody(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ("email", 'last_name', 'first_name', 'middle_name', 'phone_number',)
-        widgets = {
-            'last_name': forms.TextInput(attrs={
-                'class': 'g-width-90 m-input-cycle ',
-                'name': 'last_name',
-                'id': 'last_name',
-                'placeholder': _(u"Например: Сергеев"),
-            }),
-            'first_name': forms.TextInput(attrs={
-                'class': 'g-width-90 m-input-cycle',
-                'name': 'first_name',
-                'id': 'first_name',
-                'placeholder': _(u'Например: Дмитрий')
-            }),
-            'middle_name': forms.TextInput(attrs={
-                'class': 'g-width-90 m-input-cycle',
-                'name': 'middle_name',
-                'id': 'middle_name',
-                'placeholder': _(u'Например: Сергеевич')
-            }),
-            'phone_number': forms.TextInput(attrs={
-                'class': 'g-width-90 m-input-cycle inputmaskphone',
-                'name': 'phone_number',
-                'id': 'phone_number',
-                'placeholder': _(u'Например:') + ' +7 937 234 43 45',
-                'data-inputmask': "'alias': 'inputmaskphone'"
-            }),
-            'email': forms.TextInput(attrs={
-                'class': 'g-width-90 m-input-cycle',
-                'name': 'email',
-                'id': 'email',
-                'placeholder': _(u'Например:') + ' My_email@mail.ru'
-            }),
-
-        }
-
-    def save(self, commit=True):
-        user = super(UserCreationFormAnybody, self).save(commit=False)
-        user.username = self.cleaned_data["email"]
-        user.set_password(get_password_random())
-        user.is_active = False
         user.save()
         return user
 

@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*-
 from django.shortcuts import redirect, get_object_or_404, render_to_response, render
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib import auth

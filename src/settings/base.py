@@ -1,8 +1,12 @@
 import os
+import sys
+
+from settings.parts.for_celery import *
+from settings.parts.localization import *
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
@@ -24,6 +28,7 @@ INSTALLED_APPS = [
 
     'debug_toolbar',
     'django_cleanup',
+    'django_celery_monitor',
 
     'apps.accounts',
     'apps.core',
@@ -46,7 +51,9 @@ ROOT_URLCONF = 'urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ["templates"],
+        'DIRS': [
+            "templates"
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -79,22 +86,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/2.0/topics/i18n/
-
-LANGUAGE_CODE = 'ru-RU'
-
-TIME_ZONE = 'Europe/Moscow'
-
-USE_I18N = True
-
-USE_L10N = True
-
-USE_TZ = False
-
-DATE_FORMAT = 'd E Y'
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
@@ -109,12 +100,9 @@ STATICFILES_DIRS = (
 )
 
 
-# AUTH_USER_MODEL = 'accounts.User'
-
 APPEND_SLASH = True
 
 CACHES_DB = 'cached_data'
-
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
@@ -125,17 +113,6 @@ CACHES = {
 AUTH_USER_MODEL = 'accounts.User'
 
 try:
-    from settings.env.development import *
+    from settings.env.local import *
 except:
     from settings.env.production import *
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'postgresql',
-        'PORT': 5432,
-    }
-}

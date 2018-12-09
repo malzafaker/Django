@@ -17,7 +17,7 @@ restart:
 	docker-compose stop && docker-compose start
 
 shell-nginx:
-	docker exec -ti nginx_1 bash
+	docker exec -ti nginx bash
 
 shell-web:
 	docker exec -ti web bash
@@ -35,4 +35,10 @@ log-db:
 	docker-compose logs postgresql
 
 collectstatic:
-	docker exec web /bin/sh -c "python manage.py collectstatic --noinput"
+	docker exec web_project /bin/sh -c "python manage.py collectstatic --noinput"
+
+migrate:
+	docker exec web_project /bin/sh -c "python manage.py migrate"
+
+makemigrations:
+	docker exec web_project /bin/sh -c "python manage.py makemigrations"

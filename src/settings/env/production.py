@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*-
 import os
 
 DEBUG = False
@@ -15,7 +14,7 @@ DATABASES = {
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
         'HOST': os.getenv('POSTGRES_HOST'),
-        'PORT': int(os.getenv('POSTGRES_PORT')),
+        'PORT': 5432,
     }
 }
 

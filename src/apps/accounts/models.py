@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*-
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db import models
 from django.core import validators

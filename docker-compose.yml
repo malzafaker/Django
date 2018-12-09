@@ -1,10 +1,90 @@
-version: '2'  
+version: '2'
+
 services:
+
+  rabbit:
+    restart: always
+    hostname: rabbit
+    image: rabbitmq:3.6.0
+    container_name: rabbit_project
+    environment:
+      - RABBITMQ_DEFAULT_USER=django
+      - RABBITMQ_DEFAULT_PASS=django
+    ports:
+      - "5680:5672"  # we forward this port because it's useful for debugging
+
+  postgresql:
+    restart: always
+    image: postgres:10.5
+    container_name: postgresql_project
+    env_file: .env
+    volumes:
+      - db-data:/var/lib/postgresql/data/pgdata
+    ports:
+      - "5444:5432"
+
+  redis:
+    restart: always
+    image: redis:latest
+    container_name: redis_project
+    ports:
+     - '6380:6379'
+    depends_on:
+        - rabbit
+
+  web:
+    restart: always
+    build: .
+    command: /bin/bash -c "pip install -r requirements.txt; python manage.py migrate; python manage.py collectstatic --no-input; gunicorn -w 4 --bind :8002 --reload --chdir /src --pid=/tmp/project.pid --worker-class gevent wsgi:application "
+    container_name: web_project
+    env_file: .env
+    volumes:
+      - ./src:/src
+    ports:
+      - "8002:8002"
+    links:
+      - postgresql
+      - rabbit
+      - redis
+    depends_on:
+      - postgresql
+      - rabbit
+      - redis
+
+  celery:
+    restart: always
+    build: .
+    command: celery -A settings.celery worker -l info -B -E --loglevel=debug --concurrency=4
+    container_name: celery_project
+    env_file: .env
+    volumes:
+      - ./src:/src
+    links:
+      - postgresql
+    depends_on:
+      - postgresql
+      - rabbit
+      - redis
+      - web
+
+  celery-beat:
+    restart: always
+    build: .
+    command: /bin/bash -c " rm -f /src/celeryev.pid; celery -A settings.celery events -l info --camera django_celery_monitor.camera.Camera --frequency=2.0  "
+    container_name: celery_beat_project
+    env_file: .env
+    volumes:
+      - ./src:/src
+    depends_on:
+      - postgresql
+      - rabbit
+      - redis
+      - web
 
   nginx:
     restart: always
-    image: nginx:latest
-    container_name: nginx_1
+    image: dimka2014/nginx-upload-with-progress-modules:latest
+    container_name: nginx_project
     ports:
       - "8000:8000"
     volumes:
@@ -15,52 +95,5 @@ services:
     depends_on:
       - web
 
-  web:
-    restart: always
-    build: .
-    container_name: web_1
-    env_file: .env
-    volumes:
-      - ./src:/src
-      - ./src/static:/static
-      - ./src/media:/media/
-    ports:
-      - "8001:8001"
-    links:
-      - postgresql
-      - rabbit
-      - redis
-    depends_on:
-      - postgresql
-      - rabbit
-      - redis
-
-  redis:
-    restart: always
-    image: redis:latest
-    container_name: redis_1
-    ports:
-     - '6379:6379'
-    depends_on:
-        - rabbit
-
-  rabbit:
-    hostname: rabbit
-    image: rabbitmq:3.6.0
-    container_name: rabbit_1
-    environment:
-      - RABBITMQ_DEFAULT_USER=django
-      - RABBITMQ_DEFAULT_PASS=django
-    ports:
-      - "5672:5672"  # we forward this port because it's useful for debugging
-      - "15672:15672"  # here, we can access rabbitmq management plugin
-
-  postgresql:
-    image: postgres:9.3
-    container_name: postgresql
-    env_file: .env
-#    volumes:
-#      - ./config/pgdata:/var/lib/postgresql/data/pgdata
-    ports:
-      - "5433:5432"
-      - "5050:5050"
+volumes:
+  db-data:
